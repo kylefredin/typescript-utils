@@ -1,5 +1,5 @@
 interface Person {
-  id: number | undefined;
+  id?: number | undefined;
   firstName: string
   lastName: string;
 }
@@ -33,7 +33,7 @@ class HttpClient {
   }
 
   post(_: string, person: Person): Promise<Person> {
-    return Promise.resolve({ id: 3, ...person });
+    return Promise.resolve({ id: 5, ...person });
   }
 }
 
@@ -51,12 +51,22 @@ class PeopleService {
 
   patchUser(id: number, person: Partial<Person>): Promise<Person> {
     // here we could allow a partial person...
-    return this.httpClient.patch(`/api/user/${id}`, person);
+    return this.httpClient.patch(`/api/user/${id}`, { id, ...person });
   }
 
-  getUser(id: number): Promise<Person> {
+  getUser(id: number): Promise<Person|null> {
     return Promise.resolve({ id, firstName: "Test", lastName: "User" });
   }
 }
 
 const service = new PeopleService();
+
+const person5 = service.createUser({ firstName: "Another", lastName: "User" });
+
+const person6 = service.updateUser({ id: 6, firstName: "And", lastName: "Another" });
+
+const person7 = service.patchUser(7, { lastName: "Test" });
+
+const person8 = service.getUser(8);
+
+console.log({ person5, person6, person7, person8 });
